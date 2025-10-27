@@ -3,9 +3,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class Stock extends Asset {
-    private final String symbol;
+    private String symbol;
 
-    public Stock(String n, String s, float p, String mc){
+    public Stock(String n, String s, float p, String mc){ //Name, Symbol, Price, MarketCap
         super(n, p, mc);
         symbol = s;
 
