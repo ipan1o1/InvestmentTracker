@@ -10,11 +10,10 @@ public class Crypto extends Asset{
         symbol = s;
 
         String filePath = "data/crypto_prices.csv";
-        String content = symbol + "," + getPrice();
+        String content = symbol + "," + getPrice()+"\n";
 
-        try(FileWriter writer = new FileWriter(filePath)){
+        try(FileWriter writer = new FileWriter(filePath, true)){
         writer.write(content);
-        System.out.println("File written!");
         }
         catch(FileNotFoundException er){
             System.out.println("File not found!");

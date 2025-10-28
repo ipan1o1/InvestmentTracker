@@ -3,26 +3,95 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Account {
 
+    private HashMap<String, Float> positions = new HashMap<>();
+
     String filePath = "docs/transactions.csv";
+    String filePathPrices = "data/crypto_prices.csv";
 
     public void displayTransactions(){
 
-    try(BufferedReader reader = new BufferedReader(new FileReader(filePath))){
-        String line;
-        while ((line = reader.readLine()) != null){
-            System.out.println(line);
+        try(BufferedReader reader = new BufferedReader(new FileReader(filePath))){
+            String line;
+            while ((line = reader.readLine()) != null){
+                System.out.println(line);
+            }
+
+        }catch(FileNotFoundException e){
+            System.out.println("File not found!\n");
+
+        }catch(IOException er){
+            System.out.println("Could not read file!\n");
         }
 
-    }catch(FileNotFoundException e){
-        System.out.println("File not found!\n");
-
-    }catch(IOException er){
-        System.out.println("Could not read file!\n");
     }
+
+    public void displayPositions(){
+        positions.clear();
+        try(BufferedReader reader = new BufferedReader(new FileReader(filePath))){
+        String line;
+        while ((line = reader.readLine()) != null){
+            String[] parts = line.split(",");
+            String transaction = parts[0].trim();
+            String asset = parts[1].trim();
+            float value = Float.parseFloat(parts[2].trim());
+
+            float updatedPosition = positions.getOrDefault(asset, 0.0f);
+
+            if (transaction.equals("BUY")){
+                updatedPosition += value;
+            }else if (transaction.equals("SELL")){
+                updatedPosition -= value;
+            }
+
+            positions.put(asset, updatedPosition);
+        }
+
+        }catch(FileNotFoundException e){
+            System.out.println("File not found!\n");
+
+        }catch(IOException er){
+            System.out.println("Could not read file!\n");
+        }
+
+        System.out.println("\nYour Portfolio:");
+        for (Map.Entry<String, Float> entry: positions.entrySet()){
+            System.out.println(entry.getKey() +": " +entry.getValue());
+        }
+        System.out.println("\n");
+    }
+
+    public void displayNetWorth(){
+
+        float sum = 0f;
+
+        try(BufferedReader reader = new BufferedReader(new FileReader(filePathPrices))){
+        String line;
+        while ((line = reader.readLine()) != null){
+            String[] parts = line.split(",");
+            float price = Float.parseFloat(parts[1].trim());
+            HashMap<String, Float> convertedPositions = new HashMap<>(positions);
+            for (Float value : convertedPositions.values()){
+                value *= price;
+                sum += value;
+            }
+
+        }
+        System.out.println("Your net worth is: " + sum);
+
+        }catch(FileNotFoundException e){
+            System.out.println("File not found!\n");
+
+        }catch(IOException er){
+            System.out.println("Could not read file!\n");
+        }
+        
+        
 
     }
 
@@ -69,11 +138,11 @@ public class Account {
     public static void main(String[] args) {
         Account a = new Account();
         a.BUY();
-        a.displayTransactions();
         a.SELL();
-        a.displayTransactions();
         a.BUY();
         a.BUY();
         a.displayTransactions();
+        a.displayPositions();
+        a.displayNetWorth();
     }
 }
